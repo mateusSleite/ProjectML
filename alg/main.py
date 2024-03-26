@@ -4,7 +4,7 @@ from sklearn.decomposition import PCA
 from imblearn.over_sampling import RandomOverSampler
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import SGDClassifier
 from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report, confusion_matrix
@@ -40,11 +40,12 @@ def train_decision_tree(X_train, y_train):
     clf.fit(X_train, y_train)
     return clf
 
-def train_logistic_regression(X_train, y_train):
-    params = {'penalty': ['l2'],
-              'C': [0.001]}
+def train_elastic_net(X_train, y_train):
+    params = {'penalty': ['elasticnet'],
+              'alpha': [0.0001],
+              'l1_ratio': [0.1]}
     
-    clf = GridSearchCV(LogisticRegression(random_state=42), params, cv=5, scoring='accuracy')
+    clf = GridSearchCV(SGDClassifier(loss='log_loss', random_state=42), params, cv=5, scoring='accuracy')
     clf.fit(X_train, y_train)
     return clf
 
@@ -78,7 +79,7 @@ def train_models():
     X_train, _, y_train, _ = preprocess_data(df)
 
     trained_models['Decision Tree'] = train_decision_tree(X_train, y_train)
-    trained_models['Logistic Regression'] = train_logistic_regression(X_train, y_train)
+    trained_models['Elastic Net'] = train_elastic_net(X_train, y_train)
     trained_models['Random Forest'] = train_random_forest(X_train, y_train)
     trained_models['SVM'] = train_svm(X_train, y_train)
     trained_models['Bagging'] = train_bagging(X_train, y_train)

@@ -3,9 +3,9 @@ from sklearn.decomposition import PCA
 from imblearn.over_sampling import RandomOverSampler
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
 from sklearn.svm import SVC
+from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import classification_report, confusion_matrix
 import pandas as pd
 
@@ -33,16 +33,17 @@ def train_decision_tree(X_train, y_train):
               'min_samples_leaf': [1, 2, 4]}
     clf = GridSearchCV(DecisionTreeClassifier(random_state=42), params, cv=5, scoring='accuracy')
     clf.fit(X_train, y_train)
-    print(clf.best_params_);
+    print(clf.best_params_)
     return clf
 
-def train_logistic_regression(X_train, y_train):
-    params = {'penalty': ['l2'],
-              'C': [0.001, 0.01, 0.1, 1, 10, 100]}
+def train_elastic_net(X_train, y_train):
+    params = {'penalty': ['elasticnet'],
+              'alpha': [0.0001, 0.001, 0.01, 0.1, 1, 10, 100],
+              'l1_ratio': [0.1, 0.3, 0.5, 0.7, 0.9]}
     
-    clf = GridSearchCV(LogisticRegression(random_state=42, solver='lbfgs'), params, cv=5, scoring='accuracy')
+    clf = GridSearchCV(SGDClassifier(loss='log_loss', random_state=42), params, cv=5, scoring='accuracy')
     clf.fit(X_train, y_train)
-    print(clf.best_params_);
+    print(clf.best_params_)
     return clf
 
 def train_random_forest(X_train, y_train):
@@ -53,7 +54,7 @@ def train_random_forest(X_train, y_train):
     
     clf = GridSearchCV(RandomForestClassifier(random_state=42), params, cv=5, scoring='accuracy')
     clf.fit(X_train, y_train)
-    print(clf.best_params_);
+    print(clf.best_params_)
     return clf
 
 def train_svm(X_train, y_train):
@@ -62,7 +63,7 @@ def train_svm(X_train, y_train):
     
     clf = GridSearchCV(SVC(random_state=42), params, cv=5, scoring='accuracy')
     clf.fit(X_train, y_train)
-    print(clf.best_params_);
+    print(clf.best_params_)
     return clf
 
 def train_bagging(X_train, y_train):
@@ -70,26 +71,25 @@ def train_bagging(X_train, y_train):
     
     clf = GridSearchCV(BaggingClassifier(random_state=42), params, cv=5, scoring='accuracy')
     clf.fit(X_train, y_train)
-    print(clf.best_params_);
+    print(clf.best_params_)
     return clf
 
 df = pd.read_csv('alg\\creditcard.csv')
 X_train, X_test, y_train, y_test = preprocess_data(df)
 
 # clf_decision_tree = train_decision_tree(X_train, y_train)
-# clf_logistic_regression = train_logistic_regression(X_train, y_train)
+clf_elastic_net = train_elastic_net(X_train, y_train)
 # clf_random_forest = train_random_forest(X_train, y_train)
 # clf_svm = train_svm(X_train, y_train)
-clf_bagging = train_bagging(X_train, y_train)
-
+# clf_bagging = train_bagging(X_train, y_train)
 
 # print("Decision Tree:")
 # print(classification_report(y_test, clf_decision_tree.predict(X_test)))
 # print(confusion_matrix(y_test, clf_decision_tree.predict(X_test)))
 
-# print("\nLogistic Regression:")
-# print(classification_report(y_test, clf_logistic_regression.predict(X_test)))
-# print(confusion_matrix(y_test, clf_logistic_regression.predict(X_test)))
+print("\nElastic Net:")
+print(classification_report(y_test, clf_elastic_net.predict(X_test)))
+print(confusion_matrix(y_test, clf_elastic_net.predict(X_test)))
 
 # print("\nRandom Forest:")
 # print(classification_report(y_test, clf_random_forest.predict(X_test)))
@@ -99,6 +99,6 @@ clf_bagging = train_bagging(X_train, y_train)
 # print(classification_report(y_test, clf_svm.predict(X_test)))
 # print(confusion_matrix(y_test, clf_svm.predict(X_test)))
 
-print("\nBagging:")
-print(classification_report(y_test, clf_bagging.predict(X_test)))
-print(confusion_matrix(y_test, clf_bagging.predict(X_test)))
+# print("\nBagging:")
+# print(classification_report(y_test, clf_bagging.predict(X_test)))
+# print(confusion_matrix(y_test, clf_bagging.predict(X_test)))
