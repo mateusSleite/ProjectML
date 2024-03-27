@@ -1,4 +1,3 @@
-from flask import Flask, jsonify, request
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from imblearn.over_sampling import RandomOverSampler
@@ -10,7 +9,6 @@ from sklearn.svm import SVC
 from sklearn.metrics import classification_report, confusion_matrix
 import pandas as pd
 
-app = Flask(__name__)
 trained_models = {}
 
 def preprocess_data(df):
@@ -26,9 +24,9 @@ def preprocess_data(df):
     oversampler = RandomOverSampler()
     X_resampled, y_resampled = oversampler.fit_resample(df[['V1', 'V2', 'V3', 'Amount']], df['Class'])
 
-    X_train, X_test, y_train, y_test = train_test_split(X_resampled, y_resampled, test_size=0.2, random_state=42)
+    X_train, _, y_train, _ = train_test_split(X_resampled, y_resampled, test_size=0.2, random_state=42)
 
-    return X_train, X_test, y_train, y_test
+    return X_train, y_train
 
 def train_decision_tree(X_train, y_train):
     params = {'criterion': ['gini'],
@@ -76,7 +74,7 @@ def train_bagging(X_train, y_train):
 
 def train_models():
     df = pd.read_csv('alg\\creditcard.csv')
-    X_train, _, y_train, _ = preprocess_data(df)
+    X_train, y_train = preprocess_data(df)
 
     trained_models['Decision Tree'] = train_decision_tree(X_train, y_train)
     trained_models['Elastic Net'] = train_elastic_net(X_train, y_train)
@@ -84,18 +82,9 @@ def train_models():
     trained_models['SVM'] = train_svm(X_train, y_train)
     trained_models['Bagging'] = train_bagging(X_train, y_train)
 
-train_models()
-
-print('Models trained successfully!')
-
-@app.route('/evaluate_model', methods=['POST'])
-def evaluate_model_route():
-    model_name = request.json['model']
-    X_test = request.json['X_test']
-    y_test = request.json['y_test']
-
+def evaluate_model(model_name, X_test, y_test):
     if model_name not in trained_models:
-        return jsonify({'error':'Model not found'})
+        return {'error':'Model not found'}
 
     clf = trained_models[model_name]
     accuracy = clf.score(X_test, y_test)
@@ -110,7 +99,4 @@ def evaluate_model_route():
         "confusion_matrix": cm.tolist()
     }
 
-    return jsonify(results)
-
-if __name__ == '__main__':
-    app.run(debug=True)
+    return results
