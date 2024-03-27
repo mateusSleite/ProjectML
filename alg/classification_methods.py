@@ -22,7 +22,7 @@ def preprocess_data(df):
     principal_components = pca.fit_transform(df[['V1', 'V2', 'V3', 'Amount']])
 
     oversampler = RandomOverSampler()
-    X_resampled, y_resampled = oversampler.fit_resample(df[['V1', 'V2', 'V3', 'Amount']], df['Class'])
+    X_resampled, y_resampled = oversampler.fit_resample(principal_components, df['Class'])
 
     X_train, _, y_train, _ = train_test_split(X_resampled, y_resampled, test_size=0.2, random_state=42)
 

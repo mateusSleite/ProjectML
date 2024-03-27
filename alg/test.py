@@ -7,6 +7,8 @@ from sklearn.svm import SVR
 from sklearn.ensemble import RandomForestRegressor, BaggingRegressor
 from sklearn.metrics import mean_squared_error
 import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
 
 def preprocess_data(df):
     df.fillna(df.mean(), inplace=True)
@@ -18,7 +20,7 @@ def preprocess_data(df):
     pca = PCA(n_components=2)
     principal_components = pca.fit_transform(df[['V1', 'V2', 'V3', 'Amount']])
 
-    X_train, X_test, y_train, y_test = train_test_split(df[['V1', 'V2', 'V3']], df['Amount'], test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(principal_components, df['Amount'], test_size=0.2, random_state=42)
 
     return X_train, X_test, y_train, y_test
 
@@ -30,7 +32,6 @@ def train_decision_tree_regressor(X_train, y_train):
     
     reg = GridSearchCV(DecisionTreeRegressor(random_state=42), params, cv=5, scoring='neg_mean_squared_error')
     reg.fit(X_train, y_train)
-    print('kkk')
     return reg
 
 def train_elastic_net_regressor(X_train, y_train):
@@ -39,7 +40,6 @@ def train_elastic_net_regressor(X_train, y_train):
     
     reg = GridSearchCV(ElasticNet(random_state=42), params, cv=5, scoring='neg_mean_squared_error')
     reg.fit(X_train, y_train)
-    print('kkk')
     return reg
 
 def train_svr(X_train, y_train):
@@ -48,7 +48,6 @@ def train_svr(X_train, y_train):
     
     reg = GridSearchCV(SVR(), params, cv=5, scoring='neg_mean_squared_error')
     reg.fit(X_train, y_train)
-    print('kkk')
     return reg
 
 def train_random_forest_regressor(X_train, y_train):
@@ -59,7 +58,6 @@ def train_random_forest_regressor(X_train, y_train):
     
     reg = GridSearchCV(RandomForestRegressor(random_state=42), params, cv=5, scoring='neg_mean_squared_error')
     reg.fit(X_train, y_train)
-    print('kkk')
     return reg
 
 def train_bagging_regressor(X_train, y_train):
@@ -67,32 +65,32 @@ def train_bagging_regressor(X_train, y_train):
     
     reg = GridSearchCV(BaggingRegressor(random_state=42), params, cv=5, scoring='neg_mean_squared_error')
     reg.fit(X_train, y_train)
-    print('kkk')
     return reg
 
-# Carregar os dados
-df = pd.read_csv('alg\\creditcard.csv')
+def plot_results(y_test, y_pred):
+    plt.figure(figsize=(10, 6))
+    plt.plot(np.arange(len(y_test)), y_test, label='Valores Reais', marker='o', linestyle='-', color='b')
+    plt.plot(np.arange(len(y_test)), y_pred, label='Valores Previstos', marker='x', linestyle='--', color='r')
+    plt.title('Valores Reais vs Valores Previstos')
+    plt.xlabel('Índice')
+    plt.ylabel('Valor')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
 
-# Preprocessamento dos dados
+df = pd.read_csv('alg\\creditcard.csv')
 X_train, X_test, y_train, y_test = preprocess_data(df)
 
-# Treinamento dos regressores
 regressors = {
     'Decision Tree Regressor': train_decision_tree_regressor(X_train, y_train),
     'Elastic Net Regressor': train_elastic_net_regressor(X_train, y_train),
-    'SVR': train_svr(X_train, y_train),
+    'SVR Regressor': train_svr(X_train, y_train),
     'Random Forest Regressor': train_random_forest_regressor(X_train, y_train),
     'Bagging Regressor': train_bagging_regressor(X_train, y_train)
 }
 
-# Avaliação dos regressores
-results = {}
 for name, regressor in regressors.items():
     y_pred = regressor.predict(X_test)
     mse = mean_squared_error(y_test, y_pred)
-    results[name] = mse
-
-# Exibir os resultados
-print("Mean Squared Error (MSE) para cada regressor:")
-for name, mse in results.items():
-    print(f"{name}: {mse}")
+    print(f'Regressor: {name}\nMean Squared Error: {mse}')
+    plot_results(y_test, y_pred)
