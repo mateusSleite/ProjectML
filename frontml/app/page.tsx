@@ -157,7 +157,7 @@ export default function Home() {
         </form>
         {results && results.error && <p>Error: {results.error}</p>}
         {results && results.mean_squared_error && (
-          <p>Mean Squared Error: {results.mean_squared_error}</p>
+          <p className={styles.man}>Mean Squared Error: {results.mean_squared_error}</p>
         )}
         {results && results.plot_image && (
           <div className={styles.results}>
