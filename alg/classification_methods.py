@@ -96,7 +96,8 @@ def evaluate_model(model_name, X_test, y_test):
         "best_params": clf.best_params_,
         "accuracy": accuracy,
         "classification_report": report,
-        "confusion_matrix": cm.tolist()
+        "confusion_matrix": cm.tolist(),
+        "y_pred": y_pred.tolist()
     }
 
     return results

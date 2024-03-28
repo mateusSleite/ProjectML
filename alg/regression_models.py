@@ -87,7 +87,8 @@ def evaluate_regressor(regressor_name, X_test, y_test):
 
     results = {
         "best_params": reg.best_params_,
-        "mean_squared_error": mse
+        "mean_squared_error": mse,
+        "y_pred": y_pred.tolist()
     }
 
     return results
