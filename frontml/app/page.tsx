@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect, FormEvent } from "react";
+import { useState, FormEvent } from "react";
 import axios from "axios";
-import Chart from "chart.js/auto";
 import styles from "./page.module.css";
 
 type ResultState = {
@@ -11,46 +10,31 @@ type ResultState = {
   mean_squared_error?: number;
   y_test?: number[];
   y_pred?: number[];
+  plot_image?: string;
 } | null;
+
+const modelOptions = {
+  classification: [
+    "Decision Tree",
+    "Elastic Net",
+    "Random Forest",
+    "SVM",
+    "Bagging",
+  ],
+  regression: [
+    "Decision Tree Regressor",
+    "Elastic Net Regressor",
+    "SVR",
+    "Random Forest Regressor",
+    "Bagging Regressor",
+  ],
+};
 
 export default function Home() {
   const [modelType, setModelType] = useState("null");
-  const [modelName, setModelName] = useState("");
+  const [modelName, setModelName] = useState("null");
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [results, setResults] = useState<ResultState>(null);
-  const [fileData, setFileData] = useState<number[]>([]);
-
-  useEffect(() => {
-    if (csvFile) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target) {
-          const csvData = event.target.result as string;
-          const lines = csvData.split("\n");
-          const data: number[] = [];
-          for (let i = 1; i < lines.length; i++) {
-            const values = lines[i].split(",");
-            if (values.length >= 31) {
-              if(modelType == 'classification')
-              {
-                let parClass;
-                parClass = parseInt(values[30].replace(/"/g, "").trim());
-                data.push(parClass);
-              }
-              else{
-                let parRegression;
-                parRegression = parseInt(values[29].replace(/"/g, "").trim());
-                data.push(parRegression);
-              }
-            }
-          }
-          console.log(data);
-          setFileData(data);
-        }
-      };
-      reader.readAsText(csvFile);
-    }
-  }, [csvFile]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
@@ -59,8 +43,8 @@ export default function Home() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!csvFile) {
-      console.error("No CSV file selected.");
+    if (!csvFile || modelType === "null" || modelName === "null") {
+      console.error("Form is incomplete.");
       return;
     }
 
@@ -89,54 +73,6 @@ export default function Home() {
     }
   };
 
-  useEffect(() => {
-    if (results && results.y_pred && fileData.length > 0) {
-      const ctx = document.getElementById("myChart") as HTMLCanvasElement;
-      new Chart(ctx, {
-        type: "line",
-        data: {
-          datasets: [
-            {
-              label: "Actual vs Predicted",
-              data: fileData.map((value, index) => ({
-                x: value,
-                y: results.y_pred![index],
-              })),
-              borderColor: "blue",
-              backgroundColor: "blue",
-            },
-            {
-              label: "Ideal",
-              data: fileData.map((value) => ({ x: value, y: value })),
-              borderColor: "red",
-              backgroundColor: "red",
-            },
-          ],
-        },
-        options: {
-          scales: {
-            x: {
-              type: "linear",
-              position: "bottom",
-              title: {
-                display: true,
-                text: "Actual",
-              },
-            },
-            y: {
-              type: "linear",
-              position: "left",
-              title: {
-                display: true,
-                text: "Predicted",
-              },
-            },
-          },
-        },
-      });
-    }
-  }, [results, fileData]);
-
   return (
     <main className={styles.main}>
       <h1>Evaluate Machine Learning Model</h1>
@@ -146,7 +82,10 @@ export default function Home() {
             Model Type:
             <select
               value={modelType}
-              onChange={(e) => setModelType(e.target.value)}
+              onChange={(e) => {
+                setModelType(e.target.value);
+                setModelName("null");
+              }}
             >
               <option value="null">Select an Option</option>
               <option value="classification">Classification</option>
@@ -157,15 +96,24 @@ export default function Home() {
         <div>
           <label>
             Model Name:
-            <input
-              type="text"
+            <select
               value={modelName}
               onChange={(e) => setModelName(e.target.value)}
-              placeholder="Model Name"
-            />
+              disabled={modelType === "null"}
+            >
+              <option value="null">Select a Model</option>
+              {modelType !== "null" &&
+                modelOptions[modelType as keyof typeof modelOptions].map(
+                  (model) => (
+                    <option key={model} value={model}>
+                      {model}
+                    </option>
+                  )
+                )}
+            </select>
           </label>
         </div>
-        {modelType != "null" && (
+        {modelType !== "null" && (
           <div>
             <label>
               Upload CSV:
@@ -176,9 +124,18 @@ export default function Home() {
 
         <button type="submit">Submit</button>
       </form>
-      <div className={styles.results}>
-        <canvas id="myChart" />
-      </div>
+      {results && results.error && <p>Error: {results.error}</p>}
+      {results && results.mean_squared_error && (
+        <p>Mean Squared Error: {results.mean_squared_error}</p>
+      )}
+      {results && results.plot_image && (
+        <div className={styles.results}>
+          <img
+            src={`data:image/png;base64,${results.plot_image}`}
+            alt="Plot Image"
+          />
+        </div>
+      )}
     </main>
   );
 }

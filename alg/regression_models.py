@@ -6,7 +6,10 @@ from sklearn.linear_model import ElasticNet
 from sklearn.svm import SVR
 from sklearn.ensemble import RandomForestRegressor, BaggingRegressor
 from sklearn.metrics import mean_squared_error
+from io import BytesIO
+import base64
 import pandas as pd
+import matplotlib.pyplot as plt
 
 trained_regressors = {}
 
@@ -79,16 +82,40 @@ def train_regressors():
 
 def evaluate_regressor(regressor_name, X_test, y_test):
     if regressor_name not in trained_regressors:
-        return {'error':'Regressor not found'}
+        return {'error': 'Regressor not found'}
 
     reg = trained_regressors[regressor_name]
     y_pred = reg.predict(X_test)
     mse = mean_squared_error(y_test, y_pred)
 
+    wR, wP, Ymm, Ypmm = [], [], [], []
+    for i in range(len(y_test)):
+        wR.append(y_test.iloc[i])
+        wP.append(y_pred[i])
+        if len(wR) > 15:
+            Ymm.append(sum(wR) / 15)
+            Ypmm.append(sum(wP) / 15)
+            wR.pop(0)
+            wP.pop(0)
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(Ymm, label='Actual Moving Average', color='blue')
+    plt.plot(Ypmm, label='Predicted Moving Average', color='red')
+    plt.title('Moving Averages of Actual vs Predicted Values')
+    plt.xlabel('Sample Index')
+    plt.ylabel('Value')
+    plt.legend()
+
+    img = BytesIO()
+    plt.savefig(img, format='png', bbox_inches='tight')
+    plt.close()
+    img.seek(0)
+    img_base64 = base64.b64encode(img.getvalue()).decode('utf-8')
+
     results = {
         "best_params": reg.best_params_,
         "mean_squared_error": mse,
-        "y_pred": y_pred.tolist()
+        "plot_image": img_base64
     }
 
     return results

@@ -7,7 +7,13 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report, confusion_matrix
+from io import BytesIO
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg') 
+import matplotlib.pyplot as plt 
+import base64
+import seaborn as sns
 
 trained_models = {}
 
@@ -82,22 +88,43 @@ def train_models():
     trained_models['SVM'] = train_svm(X_train, y_train)
     trained_models['Bagging'] = train_bagging(X_train, y_train)
 
+def plot_confusion_matrix(cm, class_names):
+    fig, ax = plt.subplots(figsize=(10, 8))
+    sns.heatmap(cm, annot=True, fmt="d", cbar=False, cmap="Blues", ax=ax, xticklabels=class_names, yticklabels=class_names)
+    
+    plt.ylabel('Actual')
+    plt.xlabel('Predicted')
+    plt.title('Confusion Matrix')
+    
+    img = BytesIO()
+    plt.savefig(img, format='png', bbox_inches='tight', pad_inches=0.0)
+    plt.close()
+    img.seek(0)
+    img_base64 = base64.b64encode(img.getvalue()).decode('utf-8')
+    
+    return img_base64
+
 def evaluate_model(model_name, X_test, y_test):
     if model_name not in trained_models:
-        return {'error':'Model not found'}
+        return {'error': 'Model not found'}
 
     clf = trained_models[model_name]
-    accuracy = clf.score(X_test, y_test)
     y_pred = clf.predict(X_test)
-    report = classification_report(y_test, y_pred)
     cm = confusion_matrix(y_test, y_pred)
-
+    
+    class_names = ['Class 0', 'Class 1']  
+    
+    img_base64 = plot_confusion_matrix(cm, class_names)
+    
+    accuracy = clf.score(X_test, y_test)
+    report = classification_report(y_test, y_pred)
+    
     results = {
         "best_params": clf.best_params_,
         "accuracy": accuracy,
         "classification_report": report,
         "confusion_matrix": cm.tolist(),
-        "y_pred": y_pred.tolist()
+        "plot_image": img_base64 
     }
 
     return results
