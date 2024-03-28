@@ -77,8 +77,8 @@ export default function Home() {
     <main className={styles.main}>
       <h1>Evaluate Machine Learning Model</h1>
       <form onSubmit={handleSubmit} className={styles.form}>
-        <div>
-          <label>
+        <div className={styles.text}>
+          <label className={styles.centra}>
             Model Type:
             <select
               value={modelType}
@@ -93,8 +93,8 @@ export default function Home() {
             </select>
           </label>
         </div>
-        <div>
-          <label>
+        <div className={styles.text}>
+          <label className={styles.centra}>
             Model Name:
             <select
               value={modelName}
@@ -114,15 +114,15 @@ export default function Home() {
           </label>
         </div>
         {modelType !== "null" && (
-          <div>
-            <label>
+          <div className={styles.text}>
+            <label className={styles.centra}>
               Upload CSV:
               <input type="file" onChange={handleFileChange} />
             </label>
           </div>
         )}
 
-        <button type="submit">Submit</button>
+        <button className={styles.botao} type="submit">Submit</button>
       </form>
       {results && results.error && <p>Error: {results.error}</p>}
       {results && results.mean_squared_error && (

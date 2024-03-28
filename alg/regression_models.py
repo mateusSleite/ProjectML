@@ -20,7 +20,7 @@ def preprocess_data(df):
     scaler = StandardScaler()
     df[['V1', 'V2', 'V3', 'Amount']] = scaler.fit_transform(df[['V1', 'V2', 'V3', 'Amount']])
 
-    pca = PCA(n_components=2)
+    pca = PCA(n_components=3)
     principal_components = pca.fit_transform(df[['V1', 'V2', 'V3', 'Amount']])
 
     X_train, X_test, y_train, y_test = train_test_split(principal_components, df['Amount'], test_size=0.2, random_state=42)

@@ -19,7 +19,7 @@ def preprocess_csv_for_evaluation(filepath, is_classification):
     df = pd.read_csv(filepath)
     scaler = StandardScaler()
     df[['V1', 'V2', 'V3', 'Amount']] = scaler.fit_transform(df[['V1', 'V2', 'V3', 'Amount']])
-    pca = PCA(n_components=2)
+    pca = PCA(n_components=3)
     principal_components = pca.fit_transform(df[['V1', 'V2', 'V3', 'Amount']])
     
     if is_classification:

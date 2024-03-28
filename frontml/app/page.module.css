@@ -1,8 +1,32 @@
 .main {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   align-items: center;
   padding: 6rem;
   min-height: 100vh;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 5vh;
+}
+
+.text {
+  display: flex;
+  margin-bottom: 1vh;
+}
+
+.centra {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.botao {
+  margin-top: 1vh;
+  margin-bottom: 1vh;
+  width: 8vh;
 }

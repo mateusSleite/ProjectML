@@ -24,7 +24,7 @@ def preprocess_data(df):
     scaler = StandardScaler()
     df[['V1', 'V2', 'V3', 'Amount']] = scaler.fit_transform(df[['V1', 'V2', 'V3', 'Amount']])
 
-    pca = PCA(n_components=2)
+    pca = PCA(n_components=3)
     principal_components = pca.fit_transform(df[['V1', 'V2', 'V3', 'Amount']])
 
     oversampler = RandomOverSampler()
@@ -94,7 +94,7 @@ def plot_confusion_matrix(cm, class_names):
     
     plt.ylabel('Actual')
     plt.xlabel('Predicted')
-    plt.title('Confusion Matrix')
+    plt.title('Classification')
     
     img = BytesIO()
     plt.savefig(img, format='png', bbox_inches='tight', pad_inches=0.0)
