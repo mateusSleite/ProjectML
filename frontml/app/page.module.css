@@ -14,19 +14,46 @@
   margin-top: 5vh;
 }
 
-.text {
-  display: flex;
-  margin-bottom: 1vh;
+.field{
+  margin-bottom: 3vh;
 }
 
-.centra {
+.customButton {
+  margin-bottom: 4vh;
+  background-color: black;
+}
+
+.customButton:hover {
+  background-color: black;
+}
+
+.uploadButton {
+  background-color: black;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.uploadButton:hover {
+  background-color: black;
+}
+
+.border {
   display: flex;
   flex-direction: column;
   align-items: center;
+  border: 2px solid black;
+  border-radius: 10px;
+  width: 80%;
 }
 
-.botao {
-  margin-top: 1vh;
-  margin-bottom: 1vh;
-  width: 8vh;
+.results {
+  border: 2px solid black;
+  border-radius: 5px;
+  margin-bottom: 5vh;
+}
+
+.title {
+  margin-top: 4vh;
 }

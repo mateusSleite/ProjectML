@@ -99,8 +99,8 @@ def evaluate_regressor(regressor_name, X_test, y_test):
             wP.pop(0)
 
     plt.figure(figsize=(10, 6))
-    plt.plot(Ymm, label='Actual Moving Average', color='blue')
-    plt.plot(Ypmm, label='Predicted Moving Average', color='red')
+    plt.plot(Ymm, label='Actual Moving Average', color='black')
+    plt.plot(Ypmm, label='Predicted Moving Average', color='gray')
     plt.title('Moving Averages of Actual vs Predicted Values')
     plt.xlabel('Sample Index')
     plt.ylabel('Value')

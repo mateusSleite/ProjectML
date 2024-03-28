@@ -3,6 +3,14 @@
 import { useState, FormEvent } from "react";
 import axios from "axios";
 import styles from "./page.module.css";
+import {
+  FormControl,
+  Input,
+  InputLabel,
+  Select,
+  MenuItem,
+  Button,
+} from "@mui/material";
 
 type ResultState = {
   error?: string;
@@ -75,67 +83,91 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
-      <h1>Evaluate Machine Learning Model</h1>
-      <form onSubmit={handleSubmit} className={styles.form}>
-        <div className={styles.text}>
-          <label className={styles.centra}>
-            Model Type:
-            <select
-              value={modelType}
-              onChange={(e) => {
-                setModelType(e.target.value);
-                setModelName("null");
-              }}
-            >
-              <option value="null">Select an Option</option>
-              <option value="classification">Classification</option>
-              <option value="regression">Regression</option>
-            </select>
-          </label>
-        </div>
-        <div className={styles.text}>
-          <label className={styles.centra}>
-            Model Name:
-            <select
-              value={modelName}
-              onChange={(e) => setModelName(e.target.value)}
+      <div className={styles.border}>
+        <h1 className={styles.title}>Evaluate Machine Learning Model</h1>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <div className={styles.field}>
+            <FormControl variant="outlined" fullWidth>
+              <InputLabel id="model-type-label">Model Type</InputLabel>
+              <Select
+                labelId="model-type-label"
+                id="model-type"
+                value={modelType}
+                onChange={(e) => {
+                  setModelType(e.target.value as string);
+                  setModelName("null");
+                }}
+                label="Model Type"
+              >
+                <MenuItem value="null">Select an Option</MenuItem>
+                <MenuItem value="classification">Classification</MenuItem>
+                <MenuItem value="regression">Regression</MenuItem>
+              </Select>
+            </FormControl>
+          </div>
+          <div className={styles.field}>
+            <FormControl
+              variant="outlined"
+              fullWidth
               disabled={modelType === "null"}
             >
-              <option value="null">Select a Model</option>
-              {modelType !== "null" &&
-                modelOptions[modelType as keyof typeof modelOptions].map(
-                  (model) => (
-                    <option key={model} value={model}>
-                      {model}
-                    </option>
-                  )
-                )}
-            </select>
-          </label>
-        </div>
-        {modelType !== "null" && (
-          <div className={styles.text}>
-            <label className={styles.centra}>
-              Upload CSV:
-              <input type="file" onChange={handleFileChange} />
-            </label>
+              <InputLabel id="model-name-label">Model Name</InputLabel>
+              <Select
+                labelId="model-name-label"
+                id="model-name"
+                value={modelName}
+                onChange={(e) => setModelName(e.target.value as string)}
+                label="Model Name"
+              >
+                <MenuItem value="null">Select a Model</MenuItem>
+                {modelType !== "null" &&
+                  modelOptions[modelType as keyof typeof modelOptions].map(
+                    (model) => (
+                      <MenuItem key={model} value={model}>
+                        {model}
+                      </MenuItem>
+                    )
+                  )}
+              </Select>
+            </FormControl>
+          </div>
+          {modelType !== "null" && (
+            <div className={styles.field}>
+              <Input
+                id="file-upload"
+                type="file"
+                onChange={handleFileChange}
+                disableUnderline
+                style={{ display: "none" }}
+              />
+              <label htmlFor="file-upload" className={styles.uploadButton}>
+                Upload File
+              </label>
+            </div>
+          )}
+
+          <Button
+            variant="contained"
+            color="primary"
+            type="submit"
+            className={styles.customButton}
+          >
+            Submit
+          </Button>
+        </form>
+        {results && results.error && <p>Error: {results.error}</p>}
+        {results && results.mean_squared_error && (
+          <p>Mean Squared Error: {results.mean_squared_error}</p>
+        )}
+        {results && results.plot_image && (
+          <div className={styles.results}>
+            <img
+              src={`data:image/png;base64,${results.plot_image}`}
+              alt="Plot Image"
+            />
           </div>
         )}
-
-        <button className={styles.botao} type="submit">Submit</button>
-      </form>
-      {results && results.error && <p>Error: {results.error}</p>}
-      {results && results.mean_squared_error && (
-        <p>Mean Squared Error: {results.mean_squared_error}</p>
-      )}
-      {results && results.plot_image && (
-        <div className={styles.results}>
-          <img
-            src={`data:image/png;base64,${results.plot_image}`}
-            alt="Plot Image"
-          />
-        </div>
-      )}
+      </div>
     </main>
   );
 }

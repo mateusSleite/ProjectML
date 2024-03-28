@@ -90,7 +90,7 @@ def train_models():
 
 def plot_confusion_matrix(cm, class_names):
     fig, ax = plt.subplots(figsize=(10, 8))
-    sns.heatmap(cm, annot=True, fmt="d", cbar=False, cmap="Blues", ax=ax, xticklabels=class_names, yticklabels=class_names)
+    sns.heatmap(cm, annot=True, fmt="d", cbar=False, cmap="Greys", ax=ax, xticklabels=class_names, yticklabels=class_names)
     
     plt.ylabel('Actual')
     plt.xlabel('Predicted')
