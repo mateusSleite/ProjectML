@@ -44,7 +44,6 @@ def evaluate_classification():
         X_test, y_test = preprocess_csv_for_evaluation(filepath, True)
         results = evaluate_classification_model(model_name, X_test, y_test)
         os.remove(filepath)
-        print(results)
         return jsonify(results)
     else:
         return jsonify({'error': 'No file provided'}), 400
@@ -62,7 +61,6 @@ def evaluate_regressor():
         X_test, y_test = preprocess_csv_for_evaluation(filepath, False)
         results = evaluate_regression_model(regressor_name, X_test, y_test)
         os.remove(filepath)
-        
         return jsonify(results)
     else:
         return jsonify({'error': 'No file provided'}), 400

@@ -163,7 +163,6 @@ export default function Home() {
           <div className={styles.results}>
             <img
               src={`data:image/png;base64,${results.plot_image}`}
-              alt="Plot Image"
             />
           </div>
         )}

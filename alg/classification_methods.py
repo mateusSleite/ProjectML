@@ -106,7 +106,7 @@ def plot_confusion_matrix(cm, class_names):
 
 def evaluate_model(model_name, X_test, y_test):
     if model_name not in trained_models:
-        return {'error': 'Model not found'}
+        return {'error: model no trainning'}
 
     clf = trained_models[model_name]
     y_pred = clf.predict(X_test)
