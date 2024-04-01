@@ -14,7 +14,7 @@ import {
 
 type ResultState = {
   error?: string;
-  best_params?: any;
+  classification_report?: string;
   mean_squared_error?: number;
   y_test?: number[];
   y_pred?: number[];
@@ -61,11 +61,10 @@ export default function Home() {
     formData.append("model", modelName);
 
     try {
-      const endpoint = `http://localhost:5000/${
-        modelType === "classification"
-          ? "evaluate_classification"
-          : "evaluate_regressor"
-      }`;
+      const endpoint = `http://localhost:5000/${modelType === "classification"
+        ? "evaluate_classification"
+        : "evaluate_regressor"
+        }`;
       const response = await axios.post(endpoint, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -156,6 +155,12 @@ export default function Home() {
           </Button>
         </form>
         {results && results.error && <p>Error: {results.error}</p>}
+        {results && results.classification_report && (
+          <div className={styles.report}>
+            <pre className={styles.resul}>{results.classification_report}</pre>
+          </div>
+        )}
+
         {results && results.mean_squared_error && (
           <p className={styles.man}>Mean Squared Error: {results.mean_squared_error}</p>
         )}
